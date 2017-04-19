@@ -14,10 +14,10 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = 'primary'
-               BlueprintIdentifier = '77CAE5C3F4CDF0C419E3A7163C81269F'
-               BlueprintName = 'Pods-ParseUrlTool'
+               BlueprintIdentifier = '0DD699F3B018272291B2A6E03FAB0EDB'
+               BlueprintName = 'SVProgressHUD'
                ReferencedContainer = 'container:Pods.xcodeproj'
-               BuildableName = 'libPods-ParseUrlTool.a'>
+               BuildableName = 'libSVProgressHUD.a'>
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>

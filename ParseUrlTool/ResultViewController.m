@@ -11,9 +11,11 @@
 #import "CYJCollectionViewCell.h"
 #import <SDWebImage/UIImageView+WebCache.h>
 #import <SDWebImage/SDImageCache.h>
+#import "SVProgressHUD.h"
 
 @interface ResultViewController ()<UIScrollViewDelegate,PSCollectionViewDataSource,PSCollectionViewDelegate>
 @property (nonatomic, strong) PSCollectionView *collectionView;
+@property (nonatomic, strong) NSMutableSet *selectedImageSet;
 @end
 
 @implementation ResultViewController
@@ -32,6 +34,8 @@
     self.collectionView.numColsPortrait = 2;
     self.collectionView.numColsLandscape = 3;
     [self.view addSubview:self.collectionView];
+    
+    _selectedImageSet = [[NSMutableSet alloc] init];
 }
 
 - (void)setImageUrls:(NSArray *)imageUrls
@@ -43,6 +47,33 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (IBAction)saveImageAction:(UIBarButtonItem *)sender
+{
+    NSLog(@"selected images:%@", _selectedImageSet);
+    if (_selectedImageSet.count != 0)
+    {
+        [SVProgressHUD show];
+        [_selectedImageSet enumerateObjectsUsingBlock:^(id  _Nonnull obj, BOOL * _Nonnull stop) {
+            NSNumber *indexNum = (NSNumber *)obj;
+            NSInteger index = [indexNum integerValue];
+            UIImage *saveImage = [[SDImageCache sharedImageCache] imageFromCacheForKey:_imageUrls[index]];
+            UIImageWriteToSavedPhotosAlbum(saveImage, self, @selector(image:didFinishSavingWithError:contextInfo:), NULL);
+        }];
+        //[SVProgressHUD dismiss];
+        [SVProgressHUD showSuccessWithStatus:@"保存到相册" maskType:SVProgressHUDMaskTypeBlack];
+        
+    }
+    else
+    {
+        NSLog(@"选择图片为0");
+    }
+}
+
+- (void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo
+{
+
 }
 
 #pragma mark PSCollectionViewDataSource
@@ -75,11 +106,18 @@
 {
     CYJCollectionViewCell *collectionCell = (CYJCollectionViewCell *)cell;
     collectionCell.isSelected = !collectionCell.isSelected;
-    NSLog(@"index:%d", index);
+    if (collectionCell.isSelected)
+    {
+        [_selectedImageSet addObject:@(index)];
+    }
+    else
+    {
+        [_selectedImageSet removeObject:@(index)];
+    }
     
     //- (nullable UIImage *)imageFromCacheForKey:(nullable NSString *)key;
-    UIImage *im = [[SDImageCache sharedImageCache] imageFromCacheForKey:_imageUrls[index]];
-    NSLog(@"image=%@", im);
+//    UIImage *im = [[SDImageCache sharedImageCache] imageFromCacheForKey:_imageUrls[index]];
+//    NSLog(@"image=%@", im);
 }
 
 - (Class)collectionView:(PSCollectionView *)collectionView cellClassForRowAtIndex:(NSInteger)index
